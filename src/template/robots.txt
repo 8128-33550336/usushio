@@ -1,0 +1,7 @@
+# usush.io
+#
+# {{message}}
+#
+
+User-agent: *
+Disallow:

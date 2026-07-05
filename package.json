@@ -1,0 +1,18 @@
+{
+  "name": "usushio",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "canvas": "3.1.2",
+    "mustache": "4.2.0",
+    "punycode": "2.3.1"
+  }
+}

@@ -4,7 +4,7 @@ const fontFamily = "Noto Sans JP";
 const fontPath = process.env.FONT_PATH ?? "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc";
 registerFont(fontPath, { family: fontFamily });
 
-export const genImage = async ({ text = "", color = "#000", backgroundColor = "#fff", width = 1200, height = 630 }) => {
+export const genImage = async ({ text = "", color = "#000", backgroundColor = "#fff", width = 1200, height = 630, format = "image/png" }) => {
     const lines = text.split("\n");
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
@@ -25,5 +25,5 @@ export const genImage = async ({ text = "", color = "#000", backgroundColor = "#
         context.fillText(line, width / 2, height / 2 - ((lines.length - 1) / 2 - index) * size);
     });
 
-    return canvas.toBuffer("image/png");
+    return canvas.toBuffer(format);
 };

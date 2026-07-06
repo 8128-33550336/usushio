@@ -1,7 +1,8 @@
 import reqJson from "./json.js";
 import reqHtml from "./html.js";
-import reqPng from "./png.js";
-import reqWebp from "./webp.js";
+import reqJpeg from "./image/jpeg.js";
+import reqPng from "./image/png.js";
+import reqWebp from "./image/webp.js";
 import reqText from "./text.js";
 import reqRobots from "./special/robots.js";
 
@@ -16,6 +17,10 @@ export const createResponse = async (characterName, topic, format, info) => {
             }
             case "json": {
                 return reqJson(characterName, topic, info);
+            }
+            case "jpg":
+            case "jpeg": {
+                return await reqJpeg(characterName, topic, info);
             }
             case "png": {
                 return await reqPng(characterName, topic, info);

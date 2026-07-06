@@ -1,11 +1,11 @@
-import { genMessageWithLf } from "../gen/gen-message.js";
-import { genImage } from "../gen/gen-image.js";
+import { genImage } from "../../gen/gen-image.js";
+import { genMessageWithLf } from "../../gen/gen-message.js";
 
 const maxSize = 1500;
 const minSize = 30;
 
 const getSize = (text) => {
-    const size = text.split("&").filter((param) => param.startsWith("size="))[0];
+    const size = text.split("&").find((param) => param.startsWith("size="));
 
     if (!size) {
         return { width: undefined, height: undefined };
@@ -25,17 +25,14 @@ const getSize = (text) => {
     return { width, height };
 };
 
-const reqPng = async (characterName, topic, info) => {
+export const reqImage = async (characterName, topic, info, format) => {
     const message = genMessageWithLf(characterName, topic);
-
     const size = getSize(info);
 
-    const result = await genImage({
+    return genImage({
         text: message,
         width: size.width || 1200,
         height: size.height || 630,
+        format,
     });
-    return result;
 };
-
-export default reqPng;

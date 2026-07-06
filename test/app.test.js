@@ -35,3 +35,13 @@ test("WebP extension returns a WebP image", async () => {
     assert.equal(response.body.subarray(0, 4).toString("ascii"), "RIFF");
     assert.equal(response.body.subarray(8, 12).toString("ascii"), "WEBP");
 });
+
+for (const extension of ["jpg", "jpeg"]) {
+    test(`.${extension} extension returns a JPEG image`, async () => {
+        const response = await createAppResponse("usush.io", `/topic.${extension}`, "size=30x30");
+
+        assert.equal(response.statusCode, 200);
+        assert.equal(response.contentType, "image/jpeg");
+        assert.deepEqual(response.body.subarray(0, 3), Buffer.from([0xff, 0xd8, 0xff]));
+    });
+}

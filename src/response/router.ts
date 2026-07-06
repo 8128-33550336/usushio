@@ -6,27 +6,34 @@ import reqWebp from "./image/webp.js";
 import reqText from "./text.js";
 import reqRobots from "./special/robots.js";
 
-export const createResponse = async (characterName, topic, format, info) => {
+export type ResponseFormat = "html" | "json" | "jpg" | "jpeg" | "png" | "webp" | "txt";
+
+export const createResponse = async (
+    characterName: string,
+    topic: string,
+    format: ResponseFormat,
+    info: string,
+): Promise<string | Buffer> => {
     // special
     if (topic === "robots" && format === "txt") {
-        return reqRobots(characterName, "robots.txt", info);
+        return reqRobots(characterName, "robots.txt");
     } else {
         switch (format) {
             case "html": {
-                return reqHtml(characterName, topic, info);
+                return reqHtml(characterName, topic);
             }
             case "json": {
                 return reqJson(characterName, topic, info);
             }
             case "jpg":
             case "jpeg": {
-                return await reqJpeg(characterName, topic, info);
+                return reqJpeg(characterName, topic, info);
             }
             case "png": {
-                return await reqPng(characterName, topic, info);
+                return reqPng(characterName, topic, info);
             }
             case "webp": {
-                return await reqWebp(characterName, topic, info);
+                return reqWebp(characterName, topic, info);
             }
             case "txt": {
                 return reqText(characterName, topic, info);

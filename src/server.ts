@@ -15,7 +15,9 @@ const server = createServer(async (request, response) => {
             return;
         }
 
-        const forwardedHost = request.headers["x-forwarded-host"]?.split(",")[0].trim();
+        const forwardedHeader = request.headers["x-forwarded-host"];
+        const forwardedHost = (Array.isArray(forwardedHeader) ? forwardedHeader[0] : forwardedHeader)
+            ?.split(",")[0]?.trim();
         const rawHost = (forwardedHost || request.headers.host || "").replace(/:\d+$/, "");
         const requestUrl = new URL(request.url ?? "/", "http://localhost");
         const result = await createAppResponse(rawHost, requestUrl.pathname, requestUrl.search.slice(1));

@@ -1,6 +1,6 @@
 import { genMessageWithSpace } from "../gen/gen-message.js";
 
-const reqText = (characterName, topic, info) => {
+const reqText = (characterName: string, topic: string, _info: string): string => {
     const message = genMessageWithSpace(characterName, topic);
 
     return message;

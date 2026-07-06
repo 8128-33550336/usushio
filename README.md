@@ -2,7 +2,7 @@
 
 ホスト名とURLパスから、メッセージを生成して返すWebサーバーです。
 
-HTML、JSON、プレーンテキスト、PNG画像での出力に対応しています。Node.jsアプリケーションとしてDockerコンテナ内で動作します。
+HTML、JSON、プレーンテキスト、PNG・JPEG・WebP画像での出力に対応しています。TypeScriptで実装され、Node.jsアプリケーションとしてDockerコンテナ内で動作します。
 
 ## 使用ライブラリ
 
@@ -24,10 +24,20 @@ docker compose up --build
 curl -H 'Host: usush.io' http://localhost:3000/
 ```
 
+Dockerを使わずに実行する場合は、Node.js 22以降と画像生成ライブラリのネイティブ依存関係が必要です。
+
+```console
+npm ci
+npm run build
+npm start
+```
+
 ## テスト
 
 テストもコンテナ内で実行します。
 
 ```console
-docker compose run --rm app npm test
+docker compose -f compose.test.yaml run --rm test
 ```
+
+ローカルでは `npm test` でTypeScriptのコンパイルとテストを実行できます。

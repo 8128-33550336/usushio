@@ -1,4 +1,4 @@
-FROM node:22-bookworm-slim AS dependencies
+FROM node:22-bookworm-slim AS build
 
 WORKDIR /app
 
@@ -15,10 +15,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev --no-audit --no-fund \
-    && npm cache clean --force
+RUN npm ci --no-audit --no-fund
 
-FROM node:22-bookworm-slim AS runtime
+COPY tsconfig.json ./
+COPY src ./src
+RUN npm run build
+
+FROM node:22-bookworm-slim
 
 ENV NODE_ENV=production \
     HOST=0.0.0.0 \
@@ -35,11 +38,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=build /app/node_modules ./node_modules
+COPY --from=build /app/dist ./dist
 COPY package.json package-lock.json ./
-COPY src ./src
+RUN npm prune --omit=dev \
+    && npm cache clean --force
 
 USER node
 EXPOSE 3000
 
-CMD ["node", "src/server.js"]
+CMD ["node", "dist/server.js"]

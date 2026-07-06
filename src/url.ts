@@ -1,30 +1,44 @@
 import punycode from "punycode";
 
-const checkValidHostname = (hostname) => {
+interface EncodedValue {
+    encoded: string;
+    raw: string;
+}
+
+export interface ParsedUrl {
+    characterName: string;
+    topic: string;
+    format: string;
+    info: string;
+}
+
+const codePoint = (char: string): number => char.codePointAt(0)!;
+
+const checkValidHostname = (hostname: string): boolean => {
     return hostname.match(/^([-a-z0-9]+)\.usush\.io$/) !== null;
 };
 
-const isCharRange = (char, start, end) => {
-    const codePoint = char.codePointAt(0);
-    return codePoint >= start.codePointAt(0) && codePoint <= end.codePointAt(0);
+const isCharRange = (char: string, start: string, end: string): boolean => {
+    const value = codePoint(char);
+    return value >= codePoint(start) && value <= codePoint(end);
 };
 
 const allowedSymbols = " !\"#$%&'()*+,./:;<=>?@[\\]^_`{|}~"; // without hyphen
 
-const encodeAscii = (host) => {
+const encodeAscii = (host: string): string | null => {
     let output = "";
     for (const char of host) {
         if (isCharRange(char, "a", "z") || isCharRange(char, "0", "9")) {
             output += char;
         } else if (isCharRange(char, "A", "Z")) {
-            output += "-" + String.fromCodePoint(char.codePointAt(0) + 0x20);
+            output += "-" + String.fromCodePoint(codePoint(char) + 0x20);
         } else if (char === "-") {
             output += "--";
         } else if (isCharRange(char, "\x00", "\x7f")) {
             if (!allowedSymbols.includes(char)) {
                 return null;
             }
-            const code = char.codePointAt(0);
+            const code = codePoint(char);
             output += "-" + code.toString(16).padStart(2, "0");
         } else {
             output += char;
@@ -33,7 +47,7 @@ const encodeAscii = (host) => {
     return output;
 };
 
-export const encodeHostname = (characterName) => {
+export const encodeHostname = (characterName: string): EncodedValue | null => {
     if (characterName === "あかり") {
         return {
             encoded: "usush.io",
@@ -64,7 +78,7 @@ export const encodeHostname = (characterName) => {
     };
 };
 
-const decodeAscii = (host) => {
+const decodeAscii = (host: string): string | null => {
     let output = "";
     let isBeforeHyphen = false;
     let beforeCodeFirst = null;
@@ -73,7 +87,7 @@ const decodeAscii = (host) => {
             if (char === "-") {
                 output += "-";
             } else if (isCharRange(char, "a", "z")) {
-                output += String.fromCodePoint(char.codePointAt(0) - 0x20);
+                output += String.fromCodePoint(codePoint(char) - 0x20);
             } else if (isCharRange(char, "0", "7")) {
                 beforeCodeFirst = char;
             } else {
@@ -83,13 +97,13 @@ const decodeAscii = (host) => {
         } else {
             if (beforeCodeFirst !== null) {
                 if (isCharRange(char, "0", "9")) {
-                    const calcChar = String.fromCodePoint((beforeCodeFirst.codePointAt(0) - 0x30) * 16 + (char.codePointAt(0) - 0x30));
+                    const calcChar = String.fromCodePoint((codePoint(beforeCodeFirst) - 0x30) * 16 + (codePoint(char) - 0x30));
                     if (!allowedSymbols.includes(calcChar)) {
                         return null;
                     }
                     output += calcChar;
                 } else if (isCharRange(char, "a", "f")) {
-                    const calcChar = String.fromCodePoint((beforeCodeFirst.codePointAt(0) - 0x30) * 16 + (char.codePointAt(0) - 0x61 + 0xa));
+                    const calcChar = String.fromCodePoint((codePoint(beforeCodeFirst) - 0x30) * 16 + (codePoint(char) - 0x61 + 0xa));
                     if (!allowedSymbols.includes(calcChar)) {
                         return null;
                     }
@@ -110,13 +124,13 @@ const decodeAscii = (host) => {
     return output;
 };
 
-export const decodeHostname = (host) => {
+export const decodeHostname = (host: string): string | null => {
     const subDomain = host.match(/^([-a-z0-9\.]+)\.usush\.io$/)?.[1] ?? "xn--l8js3q"; // あかり
     const characterName = decodeAscii(punycode.toUnicode(subDomain));
     return characterName;
 };
 
-const toPathName = (topic) => {
+const toPathName = (topic: string): EncodedValue | null => {
     if (topic === "うすしお") {
         return {
             encoded: "",
@@ -134,7 +148,7 @@ const toPathName = (topic) => {
     }
 };
 
-export const fromPathName = (rawPath, rawQueryString) => {
+export const fromPathName = (rawPath: string, rawQueryString: string): string => {
     const orig = (rawPath + (rawQueryString ? "?" + rawQueryString : "")).slice(1);
     try {
         return decodeURI(orig);
@@ -143,21 +157,20 @@ export const fromPathName = (rawPath, rawQueryString) => {
     }
 };
 
-const getExt = (path, format, info) => {
+const getExt = (path: string, format: string, info: string): string => {
     if (!path.includes(".") && format === "html" && info == "" && !path.endsWith("?")) {
         return "";
     }
     return info === "" ? `.${format}` : `.${format}?${info}`;
 };
 
-export const genUrl = (characterName, topic, format, info) => {
+export const genUrl = (characterName: string, topic: string, format: string, info: string): EncodedValue | null => {
     const host = encodeHostname(characterName);
     const path = toPathName(topic);
-    const ext = getExt(path.encoded, format, info);
-
     if (host === null || path === null) {
         return null;
     }
+    const ext = getExt(path.encoded, format, info);
 
     return {
         encoded: `https://${host.encoded}/${path.encoded}${ext}`,
@@ -165,7 +178,7 @@ export const genUrl = (characterName, topic, format, info) => {
     };
 };
 
-const parseExt = (path) => {
+const parseExt = (path: string): Pick<ParsedUrl, "topic" | "format" | "info"> => {
     const lastIndex = path.lastIndexOf(".");
     if (lastIndex === -1) {
         return {
@@ -181,11 +194,11 @@ const parseExt = (path) => {
     }
 };
 
-const removeAsciiControlChars = (str) => {
+const removeAsciiControlChars = (str: string): string => {
     return str.replace(/[\x00-\x1F\x7F]/g, "");
 };
 
-export const parseUrl = (rawHost, rawPath, rawQueryString) => {
+export const parseUrl = (rawHost: string, rawPath: string, rawQueryString: string): ParsedUrl | null => {
     const characterName = decodeHostname(rawHost);
     const path = removeAsciiControlChars(fromPathName(rawPath, rawQueryString));
 

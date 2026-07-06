@@ -15,7 +15,7 @@ test("hostname and path generate JSON", async () => {
     const response = await createAppResponse("xn--p8jnt0s.usush.io", "/ラムレーズン.json", "");
 
     assert.equal(response.statusCode, 200);
-    assert.deepEqual(JSON.parse(response.body), {
+    assert.deepEqual(JSON.parse(response.body.toString()), {
         name: "きょうこ",
         topic: "ラムレーズン",
         message: "わぁいラムレーズン きょうこラムレーズン大好き",

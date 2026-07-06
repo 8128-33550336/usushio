@@ -1,10 +1,24 @@
 import { createCanvas, registerFont } from "canvas";
+import { existsSync } from "node:fs";
+
+export type ImageFormat = "image/png" | "image/jpeg";
+
+interface ImageOptions {
+    text?: string;
+    color?: string;
+    backgroundColor?: string;
+    width?: number;
+    height?: number;
+    format?: ImageFormat;
+}
 
 const fontFamily = "Noto Sans JP";
 const fontPath = process.env.FONT_PATH ?? "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc";
-registerFont(fontPath, { family: fontFamily });
+if (existsSync(fontPath)) {
+    registerFont(fontPath, { family: fontFamily });
+}
 
-export const genImage = async ({ text = "", color = "#000", backgroundColor = "#fff", width = 1200, height = 630, format = "image/png" }) => {
+export const genImage = async ({ text = "", color = "#000", backgroundColor = "#fff", width = 1200, height = 630, format = "image/png" }: ImageOptions): Promise<Buffer> => {
     const lines = text.split("\n");
     const canvas = createCanvas(width, height);
     const context = canvas.getContext("2d");
@@ -25,5 +39,7 @@ export const genImage = async ({ text = "", color = "#000", backgroundColor = "#
         context.fillText(line, width / 2, height / 2 - ((lines.length - 1) / 2 - index) * size);
     });
 
-    return canvas.toBuffer(format);
+    return format === "image/jpeg"
+        ? canvas.toBuffer("image/jpeg")
+        : canvas.toBuffer("image/png");
 };

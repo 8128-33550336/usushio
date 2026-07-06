@@ -1,6 +1,7 @@
 import reqJson from "./json.js";
 import reqHtml from "./html.js";
 import reqPng from "./png.js";
+import reqWebp from "./webp.js";
 import reqText from "./text.js";
 import reqRobots from "./special/robots.js";
 
@@ -18,6 +19,9 @@ export const createResponse = async (characterName, topic, format, info) => {
             }
             case "png": {
                 return await reqPng(characterName, topic, info);
+            }
+            case "webp": {
+                return await reqWebp(characterName, topic, info);
             }
             case "txt": {
                 return reqText(characterName, topic, info);

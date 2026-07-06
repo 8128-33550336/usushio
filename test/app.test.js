@@ -26,3 +26,12 @@ test("unsupported extensions return 404", async () => {
     const response = await createAppResponse("usush.io", "/topic.xml", "");
     assert.equal(response.statusCode, 404);
 });
+
+test("WebP extension returns a WebP image", async () => {
+    const response = await createAppResponse("usush.io", "/topic.webp", "size=30x30");
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.contentType, "image/webp");
+    assert.equal(response.body.subarray(0, 4).toString("ascii"), "RIFF");
+    assert.equal(response.body.subarray(8, 12).toString("ascii"), "WEBP");
+});

@@ -23,7 +23,7 @@ COPY tsconfig.json tsconfig.test.json ./
 COPY src ./src
 COPY test ./test
 
-RUN npm test
+RUN npm run build:test
 
 FROM node:22-bookworm-slim
 
@@ -41,9 +41,10 @@ RUN apt-get update \
 
 WORKDIR /app
 
+COPY package.json package-lock.json ./
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/dist-test ./dist-test
 
 USER node
 
-CMD ["node", "--test", "dist-test/test"]
+CMD ["npm", "test"]

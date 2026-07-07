@@ -8,8 +8,9 @@
   },
   "scripts": {
     "build": "tsc && cp -R src/template dist/",
+    "build:test": "rm -rf dist-test && tsc -p tsconfig.test.json && cp -R src/template dist-test/src/",
     "start": "node dist/server.js",
-    "test": "rm -rf dist-test && tsc -p tsconfig.test.json && cp -R src/template dist-test/src/ && node --test dist-test/test"
+    "test": "node --test dist-test/test/*.test.js"
   },
   "dependencies": {
     "canvas": "3.1.2",

@@ -40,4 +40,4 @@ npm start
 docker compose -f compose.test.yaml run --build --rm test
 ```
 
-ローカルでは `npm test` でTypeScriptのコンパイルとテストを実行できます。
+テストのコンパイルと実行はテスト用コンテナ内で行います。

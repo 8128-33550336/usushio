@@ -7,6 +7,10 @@ import { readTemplate } from "../template.js";
 const templateMain = readTemplate("app.html");
 const staticFileBaseUrl = process.env.STATIC_FILE_BASE_URL ?? "https://usushio-static.8128-33550336.com/";
 
+const twitterText = (message: string, encodeHtmlUrl: string): string => {
+    return `${message}\n\n${encodeHtmlUrl}\n\n#usushio`;
+};
+
 const reqHtml = (characterName: string, topic: string): string => {
     const message = genMessageWithSpace(characterName, topic);
     const [messageFirst, messageSecond] = genMessageArray(characterName, topic);
@@ -22,6 +26,7 @@ const reqHtml = (characterName: string, topic: string): string => {
         image1200x630Url,
         image720x720Url,
         staticFileBaseUrl,
+        twitterUrl: `https://x.com/intent/tweet?text=${encodeURIComponent(twitterText(message, encodeHtmlUrl))}`,
         misskeyUrl: `https://misskey-hub.net/share/?text=${encodeURIComponent(message)}&url=${encodeURIComponent(encodeHtmlUrl)}&visibility=public&localOnly=0`,
         mailUrl: `mailto:?subject=${encodeURIComponent(message)}&body=${encodeURIComponent(`${message}\n\n${encodeHtmlUrl}`)}`,
     });

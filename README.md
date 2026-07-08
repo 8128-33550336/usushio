@@ -1,5 +1,11 @@
 # usushio
 
+わぁいうすしお あかりうすしお大好き
+
+https://usush.io
+
+## about
+
 ホスト名とURLパスから、メッセージを生成して返すWebサーバーです。
 
 HTML、JSON、プレーンテキスト、PNG・JPEG・WebP画像での出力に対応しています。TypeScriptで実装され、Node.jsアプリケーションとしてDockerコンテナ内で動作します。
